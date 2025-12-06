@@ -1,0 +1,32 @@
+# Node / frontend
+node_modules/
+*.log
+frontend/dist/
+frontend/.vite/
+
+# Python / backend
+__pycache__/
+*.py[cod]
+*.pyo
+.python-version
+.venv/
+env/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# Env & local configs
+.env
+.env.*
+
+# OS / IDE
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Docker / build artifacts
+.docker/
+*.local.yaml
+coverage/
