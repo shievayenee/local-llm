@@ -97,6 +97,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   max-width: 80%;
   line-height: 1.5;
+  white-space: pre-wrap;
 }
 
 .bubble-muted {
@@ -145,6 +146,22 @@
 .error {
   color: #ffb3b3;
   padding: 0 16px 16px;
+}
+
+.code-block {
+  background: #0d1220;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 8px 0 0;
+  color: #dfe7ff;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+}
+
+.text-part {
+  margin: 0;
 }
 
 @media (max-width: 768px) {

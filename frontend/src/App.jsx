@@ -2,6 +2,31 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { sendChat } from "./lib/api";
 
+const parseContentParts = (text) => {
+  const parts = [];
+  const fence = /```([a-zA-Z0-9_-]*)?\n?([\s\S]*?)```/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = fence.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ type: "text", content: text.slice(lastIndex, match.index) });
+    }
+    parts.push({
+      type: "code",
+      lang: match[1] || "",
+      content: match[2].trim(),
+    });
+    lastIndex = fence.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({ type: "text", content: text.slice(lastIndex) });
+  }
+
+  return parts.length ? parts : [{ type: "text", content: text }];
+};
+
 const DEFAULT_PROMPT = "Say hi!";
 
 function App() {
@@ -68,7 +93,19 @@ function App() {
           {displayMessages.map((msg, idx) => (
             <div key={idx} className={`chat-row ${msg.role}`}>
               <div className="avatar">{msg.role === "user" ? "🧑" : "🤖"}</div>
-              <div className="bubble">{msg.content}</div>
+              <div className="bubble">
+                {parseContentParts(msg.content).map((part, innerIdx) =>
+                  part.type === "code" ? (
+                    <pre className="code-block" key={`${idx}-${innerIdx}`}>
+                      <code>{part.content}</code>
+                    </pre>
+                  ) : (
+                    <p className="text-part" key={`${idx}-${innerIdx}`}>
+                      {part.content}
+                    </p>
+                  )
+                )}
+              </div>
             </div>
           ))}
           {loading && (
