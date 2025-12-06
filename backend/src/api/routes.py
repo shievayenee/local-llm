@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import StreamingResponse
 
 from models.schemas import ChatRequest, ChatResponse, HealthResponse
-from services.ollama_client import generate_chat_completion
+from services.ollama_client import generate_chat_completion, stream_chat_completion
 
 router = APIRouter(prefix="/v1", tags=["api"])
 
@@ -24,3 +25,18 @@ async def chat(request: ChatRequest) -> ChatResponse:
         ) from exc
 
     return ChatResponse.model_validate(result)
+
+
+@router.post("/chat/stream")
+async def chat_stream(request: ChatRequest):
+    try:
+        generator = stream_chat_completion(
+            messages=request.messages, model=request.model
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Ollama completion failed: {exc}",
+        ) from exc
+
+    return StreamingResponse(generator, media_type="text/plain")

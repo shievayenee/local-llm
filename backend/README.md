@@ -21,3 +21,4 @@
 ```
 Returns assistant reply from the local Ollama model.
 - If the specified model is missing, the backend will auto-pull it from Ollama before retrying the request.
+- `POST /api/v1/chat/stream` streams plain text tokens/chunks; send the same body as `/chat`.

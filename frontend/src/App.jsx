@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
-import { sendChat } from "./lib/api";
+import { sendChat, streamChat } from "./lib/api";
 
 const parseContentParts = (text) => {
   const parts = [];
@@ -64,9 +64,30 @@ function App() {
     setLoading(true);
     setError("");
 
+    const assistantIndex = nextMessages.length;
+    setMessages([...nextMessages, { role: "assistant", content: "" }]);
+
     try {
-      const result = await sendChat(nextMessages);
-      setMessages([...nextMessages, result.message]);
+      let finalContent = "";
+
+      try {
+        finalContent = await streamChat(nextMessages, undefined, (_, full) => {
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[assistantIndex] = { role: "assistant", content: full };
+            return updated;
+          });
+        });
+      } catch {
+        const result = await sendChat(nextMessages);
+        finalContent = result.message.content;
+      }
+
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[assistantIndex] = { role: "assistant", content: finalContent };
+        return updated;
+      });
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
